@@ -1,0 +1,51 @@
+﻿<Window x:Class="Envelope.Views.AddFolderView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Envelope.Views"
+        mc:Ignorable="d"
+        Title="AddFolderView" 
+        MinHeight="200" MinWidth="350" 
+        WindowStartupLocation="CenterOwner"
+        WindowStyle="SingleBorderWindow"
+        SizeToContent="WidthAndHeight" 
+        ResizeMode="NoResize"
+        FocusManager.FocusedElement="{Binding ElementName=txtFolderName}"
+        MouseDown="Window_MouseDown" 
+        ShowInTaskbar="False"
+        >
+    <Grid Margin="5,0,5,5">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="60"/>
+        </Grid.RowDefinitions>
+
+        <Label Content="Add Folder" FontSize="18" />
+
+       
+            <HeaderedContentControl Grid.Row="1">
+                <HeaderedContentControl.Header>
+                    <TextBlock Text="Folder Name" Margin="{StaticResource HeaderRightMargin}"/>
+                </HeaderedContentControl.Header>
+                <HeaderedContentControl.Content>
+                    <TextBox x:Name="txtFolderName" Height="28"/>
+                </HeaderedContentControl.Content>
+            </HeaderedContentControl>
+
+
+        <DockPanel Grid.Row="2" LastChildFill="False">
+          
+            <Button x:Name="btnAdd" 
+                    Height="40"
+                    Width="90"
+                    DockPanel.Dock="Right" 
+                    Content="Add" 
+                    IsDefault="True"
+                    Command="{Binding CreateFolderCommand}"
+                    />
+        </DockPanel>
+    </Grid>
+</Window>
