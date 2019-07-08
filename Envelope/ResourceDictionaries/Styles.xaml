@@ -22,4 +22,7 @@
     </Style>
 
     <Thickness x:Key="HeaderRightMargin">0,0,10,0</Thickness>
+
+    
+
 </ResourceDictionary>

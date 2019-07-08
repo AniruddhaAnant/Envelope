@@ -17,7 +17,7 @@
         </DataTemplate>
         <viewModels:ExplorerVM x:Key="ExplorerVM"/>
     </UserControl.Resources>
-    <Grid DataContext="{StaticResource ExplorerVM}">
+    <Grid DataContext="{StaticResource ExplorerVM}" Margin="0,20,20,20">
         <Grid.RowDefinitions>
             <RowDefinition Height="40"/>
             <RowDefinition Height="10"/>
@@ -28,15 +28,12 @@
                 <Image Source="/Assets/014-back.png" Width="16" Height="16"/>
             </Button>
             <Button x:Name="btnAdd" Margin="5,2,5,2"
-                    Height="40"
-                    Width="40"
-                    Command="{Binding AddFolderOnClickCommand}"
-                   >
+                    Command="{Binding AddFolderOnClickCommand}">
                 <Image Source="/Assets/007-add-1.png" Width="16" Height="16"/>
             </Button>
             <StackPanel Orientation="Horizontal" Visibility="{Binding AddFolderClicked, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolVisibilityConverter}}">
                 <TextBox Text="{Binding NewFolderName}" MinWidth="150" MinHeight="20" />
-                <Button Margin="5,2,5,2" Height="20" Width="40"
+                <Button Margin="5,2,5,2"
                         Command="{Binding CreateFolderCommand}">
                     <Image Source="/Assets/007-add-1.png" Width="16" Height="16"/>
                 </Button>
@@ -49,31 +46,18 @@
 
         <ContentControl Grid.Row="2"
                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-            <ListBox Margin="10"    
+            <ListView Margin="10"    
                      ScrollViewer.CanContentScroll="False"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                      ItemsSource="{Binding Folders,UpdateSourceTrigger=PropertyChanged,  Mode=TwoWay}"
                      ItemTemplate="{StaticResource FolderTemplate}">
 
-                <ListBox.ItemsPanel>
+                <ListView.ItemsPanel>
                     <ItemsPanelTemplate>
                         <WrapPanel />
                     </ItemsPanelTemplate>
-                </ListBox.ItemsPanel>
-                <ListBox.ItemContainerStyle>
-                    <Style>
-                        <Setter Property="Control.Width" Value="100"/>
-                        <Setter Property="Control.Margin" Value="5"/>
-                        <Style.Triggers>
-                            <Trigger Property="Control.IsMouseOver" Value="True">
-                                <Setter Property="Control.ToolTip"
-                  Value="{Binding RelativeSource={x:Static RelativeSource.Self},
-                          Path=Content.Description}"/>
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </ListBox.ItemContainerStyle>
-            </ListBox>
+                </ListView.ItemsPanel>
+            </ListView>
         </ContentControl>
     </Grid>
 </UserControl>
