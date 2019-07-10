@@ -11,7 +11,7 @@ namespace FileHelper
     {
         private string m_key;
         private string m_secretPath;
-
+        private string TempDir = Path.GetTempPath();
         public FileManager(string key, string secretPath)
         {
             m_key = key;
@@ -23,9 +23,12 @@ namespace FileHelper
         public string ImportFile(string filePath)
         {
             Crypt crypt = new Crypt();
-            crypt.FileEncrypt(filePath,m_key);
+            var updatedFilePath = TempDir + Path.GetFileName(filePath);
+            File.Copy(filePath,updatedFilePath,true);
+            crypt.FileEncrypt(updatedFilePath,m_key);
             var newPath = Path.Combine(m_secretPath, CreateGUID()+".envp");
-            File.Move(filePath+".aes", newPath);
+            File.Move(updatedFilePath+".aes", newPath);
+            File.Delete(updatedFilePath);
             return newPath;
         }
 
@@ -42,7 +45,7 @@ namespace FileHelper
             string GuidString = Convert.ToBase64String(g.ToByteArray());
             GuidString = GuidString.Replace("=", "");
             GuidString = GuidString.Replace("+", "");
-            return GuidString;
+            return GuidString.Replace("\\", "-").Replace("/","-") ;
         }
     }
 }

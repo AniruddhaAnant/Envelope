@@ -44,7 +44,7 @@ namespace Model
             string GuidString = Convert.ToBase64String(g.ToByteArray());
             GuidString = GuidString.Replace("=", "");
             GuidString = GuidString.Replace("+", "");
-            return GuidString;
+            return GuidString.Replace("\\", "-").Replace("/", "-");
         }
     }
 }

@@ -33,6 +33,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -42,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="File.cs" />
+    <Compile Include="FileHandler.cs" />
     <Compile Include="Folder.cs" />
     <Compile Include="IEnvelopeData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -52,6 +54,10 @@
     <ProjectReference Include="..\DatabaseHelper\DatabaseHelper.csproj">
       <Project>{6d9d6224-d772-4b0a-81fa-ccfb2fa08b15}</Project>
       <Name>DatabaseHelper</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FIleHelper\FileHelper.csproj">
+      <Project>{0e5e9d91-e4bb-4af9-b578-50e84f35fa15}</Project>
+      <Name>FileHelper</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
