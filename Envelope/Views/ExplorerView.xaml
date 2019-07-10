@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Envelope.Views"
              xmlns:viewModels="clr-namespace:ViewModels;assembly=ViewModels"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -15,33 +16,43 @@
                 <TextBlock Text="{Binding FolderName}"/>
             </StackPanel>
         </DataTemplate>
+        <DataTemplate x:Key="FileTemplate">
+            <StackPanel>
+                <Image Source="/Assets/003-test.png" Width="40" Height="40"/>
+                <TextBlock Text="{Binding FileName}"/>
+            </StackPanel>
+        </DataTemplate>
         <viewModels:ExplorerVM x:Key="ExplorerVM"/>
     </UserControl.Resources>
-    <Grid DataContext="{StaticResource ExplorerVM}">
+    <Grid DataContext="{StaticResource ExplorerVM}" Margin="0,20,20,20">
         <Grid.RowDefinitions>
             <RowDefinition Height="40"/>
             <RowDefinition Height="10"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal">
-            <Button  Margin="10,2,5,2">
-                <Image Source="/Assets/014-back.png" Width="16" Height="16"/>
-            </Button>
-            <Button x:Name="btnAdd" Margin="5,2,5,2"
-                    Height="40"
-                    Width="40"
-                    Command="{Binding AddFolderOnClickCommand}"
-                   >
-                <Image Source="/Assets/007-add-1.png" Width="16" Height="16"/>
+            <Button  Margin="10,2,5,2" 
+                     Content="Back"
+                     Command="{Binding NavigateBackCommand}"/>
+
+            <Button x:Name="btnAdd" 
+                    Margin="5,2,5,2"
+                    Content="New Folder"
+                    Command="{Binding AddFolderOnClickCommand}">
             </Button>
             <StackPanel Orientation="Horizontal" Visibility="{Binding AddFolderClicked, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BoolVisibilityConverter}}">
                 <TextBox Text="{Binding NewFolderName}" MinWidth="150" MinHeight="20" />
-                <Button Margin="5,2,5,2" Height="20" Width="40"
+                <Button Margin="5,2,5,2"
+                        Content="Add"
                         Command="{Binding CreateFolderCommand}">
-                    <Image Source="/Assets/007-add-1.png" Width="16" Height="16"/>
                 </Button>
             </StackPanel>
-           
+            <Button Content="Import File(s)"
+                    Margin="5,2,5,2"
+                    Command="{Binding ImportFileCommand}"/>
+            <Button Content="Export File(s)" 
+                    Margin="5,2,5,2"
+                    Command="{Binding ExportFileCommand}"/>
             <Button Content="Delete" Margin="5,2,5,2" />
             <Button Content="Export" Margin="5,2,10,2" />
         </StackPanel>
@@ -49,31 +60,56 @@
 
         <ContentControl Grid.Row="2"
                         ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-            <ListBox Margin="10"    
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <ListView x:Name="FolderList"
+                    Margin="10" 
                      ScrollViewer.CanContentScroll="False"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                      ItemsSource="{Binding Folders,UpdateSourceTrigger=PropertyChanged,  Mode=TwoWay}"
-                     ItemTemplate="{StaticResource FolderTemplate}">
+                     ItemTemplate="{StaticResource FolderTemplate}" SelectedItem="{Binding SelectedFolder}" 
+                     Visibility="{Binding IsInRootDir, Converter={StaticResource BoolVisibilityConverter}}" >
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="MouseDoubleClick">
+                            <i:InvokeCommandAction Command="{Binding OpenFolderCommand}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                    <ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel />
+                        </ItemsPanelTemplate>
+                    </ListView.ItemsPanel>
+                </ListView>
 
-                <ListBox.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel />
-                    </ItemsPanelTemplate>
-                </ListBox.ItemsPanel>
-                <ListBox.ItemContainerStyle>
-                    <Style>
-                        <Setter Property="Control.Width" Value="100"/>
-                        <Setter Property="Control.Margin" Value="5"/>
-                        <Style.Triggers>
-                            <Trigger Property="Control.IsMouseOver" Value="True">
-                                <Setter Property="Control.ToolTip"
-                  Value="{Binding RelativeSource={x:Static RelativeSource.Self},
-                          Path=Content.Description}"/>
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </ListBox.ItemContainerStyle>
-            </ListBox>
+                <ListView x:Name="FilesList"
+                          Grid.Row="1"
+                    Margin="10"    
+                          SelectionMode="Multiple"
+                      SelectedIndex="0"
+                     ScrollViewer.CanContentScroll="False"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                     ItemsSource="{Binding Files,UpdateSourceTrigger=PropertyChanged,  Mode=TwoWay}"
+                     ItemTemplate="{StaticResource FileTemplate}"
+                     SelectedItem="{Binding SelectedFile}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="MouseDoubleClick">
+                            <i:InvokeCommandAction Command="{Binding OpenFolderCommand}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                    <ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel />
+                        </ItemsPanelTemplate>
+                    </ListView.ItemsPanel>
+                </ListView>
+
+            </Grid>
+
         </ContentControl>
+
     </Grid>
 </UserControl>

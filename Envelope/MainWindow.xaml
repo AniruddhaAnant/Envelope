@@ -15,20 +15,18 @@
         <views:LoginView x:Key="loginWindowView"/>
 
     </Window.Resources>
-    <Grid DataContext="{StaticResource loginVMDataContext}">
-        <Grid.Resources>
-            
-        </Grid.Resources>
+    <Grid DataContext="{StaticResource loginVMDataContext}" Background="#FFDEDEDE">
+
         <Grid.RowDefinitions>
             <RowDefinition Height="60"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
+
         <views:AppHeader Grid.Row="0"/>
         
-        <Separator Grid.Row="1"/>
 
-        <ContentControl Grid.Row="2">
+        <ContentControl Grid.Row="2" >
             <ContentControl.Style>
                 <Style TargetType="{x:Type ContentControl}">
                     <Style.Triggers>

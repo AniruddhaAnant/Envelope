@@ -5,15 +5,16 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Envelope.Views"
              mc:Ignorable="d"             
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <Style TargetType="ContentControl" x:Key="ContentControlContentTemplateStyle" >
             <Style.Triggers>
-                <DataTrigger Binding="{Binding ElementName=itemView1, Path=IsSelected}" Value="True">
+                <DataTrigger Binding="{Binding ElementName=ItemHome, Path=IsSelected}" Value="True">
                     <Setter Property="ContentTemplate" Value="{StaticResource templateView1}" />
                 </DataTrigger>
 
-                <DataTrigger Binding="{Binding ElementName=itemView2, Path=IsSelected}" Value="True">
+                <DataTrigger Binding="{Binding ElementName=ItemCreate, Path=IsSelected}" Value="True">
                     <Setter Property="ContentTemplate" Value="{StaticResource templateView2}" />
                 </DataTrigger>
             </Style.Triggers>
@@ -21,24 +22,46 @@
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="0.3*"/>
+            <ColumnDefinition Width="0.2*"/>
             <ColumnDefinition Width="10"/>
-            <ColumnDefinition Width="0.7*"/>
+            <ColumnDefinition Width="0.8*"/>
         </Grid.ColumnDefinitions>
-        <ContentControl Margin="10,10,0,10">
-            <Expander ExpandDirection="Right" FlowDirection="LeftToRight">
-                           
-            <ListBox x:Name="leftPaneItems">
-                <ListBoxItem x:Name="itemView1"
-                             Content="Envelope"
-                             IsSelected="True"/>
-                <ListBoxItem x:Name="itemView2" 
-                             Content="test"/>
-            </ListBox>
-            </Expander>
-        </ContentControl>
 
-        <ContentControl x:Name="Target" Grid.Column="2"  Style="{StaticResource ContentControlContentTemplateStyle}"/>
-
+        <Grid x:Name="GridMenu"  Background="#FF31577E">
+            <Grid.Effect>
+                <DropShadowEffect BlurRadius="2" ShadowDepth="1" Color="#FFAEAEAE"/>
+            </Grid.Effect>
+            
+                <ListView x:Name="ListViewMenu" Foreground="#FF5C99D6" SelectedIndex="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <ListViewItem x:Name="ItemHome" Height="60">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="ViewDashboard" Height="25" Width="25" Margin="10"/>
+                            <TextBlock Text="Home" VerticalAlignment="Center" Margin="20 10"/>
+                        </StackPanel>
+                    </ListViewItem>
+                    <ListViewItem x:Name="ItemCreate" Height="60">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Pencil" Height="25" Width="25" Margin="10"/>
+                            <TextBlock Text="Create" VerticalAlignment="Center" Margin="20 10"/>
+                        </StackPanel>
+                    </ListViewItem>
+                    <ListViewItem Height="60">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Ticket" Height="25" Width="25" Margin="10"/>
+                            <TextBlock Text="Tickets" VerticalAlignment="Center"  Margin="20 10"/>
+                        </StackPanel>
+                    </ListViewItem>
+                    <ListViewItem Height="60">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Message" Height="25" Width="25" Margin="10"/>
+                            <TextBlock Text="Messages" VerticalAlignment="Center"  Margin="20 10"/>
+                        </StackPanel>
+                    </ListViewItem>
+                </ListView>
+            
+        </Grid>
+       
+            <ContentControl x:Name="Target"  Grid.Column="2" Style="{StaticResource ContentControlContentTemplateStyle}"/>
+       
     </Grid>
 </UserControl>
