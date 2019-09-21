@@ -30,12 +30,12 @@ namespace ViewModels
         private Command m_importFilesCommand;
         private Command m_exportFilesCommand;
         private Command m_deleteCommand;
-
+      
         private bool m_addFolderClicked = false;
         private Folder m_selectedFolder;
 
         private bool m_isInRootDir = true;
-
+       
         public bool IsInRootDir
         {
             get
@@ -239,9 +239,15 @@ namespace ViewModels
             saveFilesDialog.Description = "Select Export Directory";
             if (saveFilesDialog.ShowDialog() == DialogResult.OK)
             {
-                var filePath = saveFilesDialog.SelectedPath;
-                var file = SelectedFile;
-                m_filehandler.ExportFile(file.FilePath, System.IO.Path.Combine(filePath, file.FileName));
+                foreach (var file in Files)
+                {
+                    file.IsFileSelected = true; //we need to set this bool true somewhere when some item is selected. 
+                    if (file.IsFileSelected)
+                    {
+                        var filePath = saveFilesDialog.SelectedPath;
+                        m_filehandler.ExportFile(file.FilePath, System.IO.Path.Combine(filePath, file.FileName));
+                    }
+                }
             }
         }
 

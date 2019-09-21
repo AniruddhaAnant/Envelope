@@ -15,6 +15,7 @@ namespace Model
         private string m_filePath;
         private int m_folderId;
 
+        public bool IsFileSelected { get; set; }
         public string FileName { get => m_fileName; private set => m_fileName = value; }
         public int FilesId { get => m_filesId; private set => m_filesId = value; }
         public string FileExtension { get => m_fileExtension; private set => m_fileExtension = value; }
