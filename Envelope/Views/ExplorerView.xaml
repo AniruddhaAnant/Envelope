@@ -98,12 +98,11 @@
                 <ListView x:Name="FilesList"
                           Grid.Row="1"
                           Margin="10"    
-                          SelectionMode="Multiple"
                      ScrollViewer.CanContentScroll="False"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                      ItemsSource="{Binding Files, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                      ItemTemplate="{StaticResource FileTemplate}"
-                     SelectedItems="{Binding SelectedFiles}" >
+                     SelectedItem="{Binding SelectedFile}" >
                     
                     <ListView.ItemsPanel>
                         <ItemsPanelTemplate>

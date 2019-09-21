@@ -15,7 +15,7 @@ namespace ViewModels
     {
         private ObservableCollection<Folder> m_folders;
         private ObservableCollection<File> m_files;
-        public ObservableCollection<File> m_selectedFiles;
+        File m_selectedFile;
 
         private SQLiteHandler m_dbhandler;
         private FileHandler m_filehandler;
@@ -56,10 +56,14 @@ namespace ViewModels
             }
         }
 
-        public ObservableCollection<File> SelectedFiles
+        public File SelectedFile
         {
-            get { return m_selectedFiles; }
-            set { m_selectedFiles = value; }
+            get { return m_selectedFile; }
+            set
+            {
+                m_selectedFile = value;
+                RaiseEvent("SelectedFile");
+            }
         }
 
         public string NewFolderName { get; set; }
@@ -170,7 +174,7 @@ namespace ViewModels
 
         private bool CanExportFiles(object arg)
         {
-            return SelectedFiles.Count > 0;
+            return SelectedFile != null;
         }
 
         private void ExportFiles(object obj)
@@ -179,11 +183,9 @@ namespace ViewModels
             saveFilesDialog.Description = "Select Export Directory";
             if (saveFilesDialog.ShowDialog() == DialogResult.OK)
             {
-                foreach (var file in SelectedFiles)
-                {
-                    var filePath = saveFilesDialog.SelectedPath;
-                    m_filehandler.ExportFile(file.FilePath, System.IO.Path.Combine(filePath, file.FileName));
-                }
+                var filePath = saveFilesDialog.SelectedPath;
+                var file = SelectedFile;
+                m_filehandler.ExportFile(file.FilePath, System.IO.Path.Combine(filePath, file.FileName));
             }
         }
 
@@ -275,7 +277,6 @@ namespace ViewModels
         {
             Folders = new ObservableCollection<Folder>();
             Files = new ObservableCollection<File>();
-            SelectedFiles = new ObservableCollection<File>();
 
             m_dbhandler = new SQLiteHandler();
             var user = m_dbhandler.GetUser();
