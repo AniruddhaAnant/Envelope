@@ -11,6 +11,15 @@
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolVisibilityConverter"/>
         <DataTemplate x:Key="FolderTemplate">
+            <DataTemplate.Resources>
+                <Style TargetType="{x:Type StackPanel}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding FolderName}" Value="root">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DataTemplate.Resources>
             <StackPanel>
                 <Image Source="/Assets/002-folder-1.png" Width="40" Height="40"/>
                 <TextBlock Text="{Binding FolderName}"/>
@@ -71,7 +80,8 @@
                      ScrollViewer.CanContentScroll="False"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                      ItemsSource="{Binding Folders,UpdateSourceTrigger=PropertyChanged,  Mode=TwoWay}"
-                     ItemTemplate="{StaticResource FolderTemplate}" SelectedItem="{Binding SelectedFolder}" 
+                     ItemTemplate="{StaticResource FolderTemplate}" 
+                     SelectedItem="{Binding SelectedFolder}" 
                      Visibility="{Binding IsInRootDir, Converter={StaticResource BoolVisibilityConverter}}" >
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="MouseDoubleClick">
@@ -87,19 +97,14 @@
 
                 <ListView x:Name="FilesList"
                           Grid.Row="1"
-                    Margin="10"    
+                          Margin="10"    
                           SelectionMode="Multiple"
-                      SelectedIndex="0"
                      ScrollViewer.CanContentScroll="False"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                     ItemsSource="{Binding Files,UpdateSourceTrigger=PropertyChanged,  Mode=TwoWay}"
+                     ItemsSource="{Binding Files, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                      ItemTemplate="{StaticResource FileTemplate}"
-                     SelectedItem="{Binding SelectedFile}">
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="MouseDoubleClick">
-                            <i:InvokeCommandAction Command="{Binding OpenFolderCommand}" />
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
+                     SelectedItems="{Binding SelectedFiles}" >
+                    
                     <ListView.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel />

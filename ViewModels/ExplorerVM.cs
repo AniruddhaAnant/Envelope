@@ -15,6 +15,7 @@ namespace ViewModels
     {
         private ObservableCollection<Folder> m_folders;
         private ObservableCollection<File> m_files;
+        public ObservableCollection<File> m_selectedFiles;
 
         private SQLiteHandler m_dbhandler;
         private FileHandler m_filehandler;
@@ -29,10 +30,9 @@ namespace ViewModels
 
         private bool m_addFolderClicked = false;
         private Folder m_selectedFolder;
-        private File m_selectedFile;
 
         private bool m_isInRootDir = true;
-        
+
         public bool IsInRootDir
         {
             get
@@ -49,13 +49,17 @@ namespace ViewModels
         public Folder SelectedFolder
         {
             get { return m_selectedFolder; }
-            set { m_selectedFolder = value; }
+            set
+            {
+                m_selectedFolder = value;
+                RaiseEvent("SelectedFolder");
+            }
         }
 
-        public File SelectedFile
+        public ObservableCollection<File> SelectedFiles
         {
-            get { return m_selectedFile; }
-            set { m_selectedFile = value; }
+            get { return m_selectedFiles; }
+            set { m_selectedFiles = value; }
         }
 
         public string NewFolderName { get; set; }
@@ -163,14 +167,24 @@ namespace ViewModels
             }
         }
 
+
         private bool CanExportFiles(object arg)
         {
-            return true;
+            return SelectedFiles.Count > 0;
         }
 
         private void ExportFiles(object obj)
         {
-            throw new NotImplementedException();
+            FolderBrowserDialog saveFilesDialog = new FolderBrowserDialog();
+            saveFilesDialog.Description = "Select Export Directory";
+            if (saveFilesDialog.ShowDialog() == DialogResult.OK)
+            {
+                foreach (var file in SelectedFiles)
+                {
+                    var filePath = saveFilesDialog.SelectedPath;
+                    m_filehandler.ExportFile(file.FilePath, System.IO.Path.Combine(filePath, file.FileName));
+                }
+            }
         }
 
         private bool CanImportFiles(object arg)
@@ -183,13 +197,13 @@ namespace ViewModels
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Title = "Import File(s)";
             openFileDialog.Multiselect = true;
-            if(openFileDialog.ShowDialog()==DialogResult.OK)
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                foreach(var filename in openFileDialog.FileNames)
+                foreach (var filename in openFileDialog.FileNames)
                 {
                     var encFilePath = m_filehandler.ImportFile(filename);
-                    File file = new File(System.IO.Path.GetFileName(filename), 
-                        SelectedFolder.FolderId,encFilePath,System.IO.Path.GetExtension(filename));
+                    File file = new File(System.IO.Path.GetFileName(filename),
+                        SelectedFolder.FolderId, encFilePath, System.IO.Path.GetExtension(filename));
                     m_dbhandler.InsertFile(file);
                 }
             }
@@ -211,7 +225,7 @@ namespace ViewModels
 
         private bool CanOpenFolder(object arg)
         {
-            return true;
+            return SelectedFolder != Folders[0];
         }
 
         private void OpenFolder(object obj)
@@ -245,8 +259,7 @@ namespace ViewModels
             Folders.Clear();
             foreach (var folder in m_dbhandler.GetFolders())
             {
-                if (folder.FolderName != "root")
-                    Folders.Add(folder);
+                Folders.Add(folder);
             }
         }
 
@@ -262,14 +275,17 @@ namespace ViewModels
         {
             Folders = new ObservableCollection<Folder>();
             Files = new ObservableCollection<File>();
+            SelectedFiles = new ObservableCollection<File>();
+
             m_dbhandler = new SQLiteHandler();
             var user = m_dbhandler.GetUser();
-            m_filehandler = new FileHandler(user.Key,user.Uid);
+            m_filehandler = new FileHandler(user.Key, user.Uid);
 
             m_folderStack = new Stack<Folder>();
-            m_folderStack.Push(m_dbhandler.GetFolders()[0]);
-            SelectedFolder = m_folderStack.Peek();
             UpdateFolders();
+            m_folderStack.Push(Folders[0]);
+            SelectedFolder = m_folderStack.Peek();
+
             UpdateFiles();
         }
     }
