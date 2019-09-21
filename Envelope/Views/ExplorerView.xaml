@@ -64,7 +64,7 @@
             <Button Content="Export File(s)" 
                     Margin="5,2,5,2"
                     Command="{Binding ExportFileCommand}"/>
-            <Button Content="Delete" Margin="5,2,5,2" />
+            <Button Content="Delete" Margin="5,2,5,2" Command="{Binding DeleteCommand}"/>
             <Button Content="Export" Margin="5,2,10,2" />
         </StackPanel>
         <Separator Grid.Row="1"/>

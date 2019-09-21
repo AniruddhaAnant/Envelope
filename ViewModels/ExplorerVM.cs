@@ -29,6 +29,7 @@ namespace ViewModels
         private Command m_navigateBackCommand;
         private Command m_importFilesCommand;
         private Command m_exportFilesCommand;
+        private Command m_deleteCommand;
 
         private bool m_addFolderClicked = false;
         private Folder m_selectedFolder;
@@ -156,7 +157,7 @@ namespace ViewModels
 
         private void OpenFile(object obj)
         {
-            var filename = SelectedFile.FileName;       
+            var filename = SelectedFile.FileName;
             Process.Start("rundll32.exe", string.Format("shell32.dll,OpenAs_RunDLL {0}", filename));
         }
 
@@ -181,6 +182,36 @@ namespace ViewModels
                     m_importFilesCommand = new Command(ImportFiles, CanImportFiles);
                 }
                 return m_importFilesCommand;
+            }
+        }
+
+        public Command DeleteCommand
+        {
+            get
+            {
+                if (m_deleteCommand == null)
+                {
+                    m_deleteCommand = new Command(Delete, CanDelete);
+                }
+                return m_deleteCommand;
+            }
+        }
+
+        private bool CanDelete(object arg)
+        {
+            return SelectedFile != null;
+        }
+
+        private void Delete(object obj)
+        {
+            if (SelectedFile != null)
+            {
+                Files.Remove(SelectedFile);
+            }
+
+            if (SelectedFolder != null)
+            {
+                Folders.Remove(SelectedFolder);
             }
         }
 
