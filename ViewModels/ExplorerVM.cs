@@ -8,6 +8,7 @@ using ViewModels.Helpers;
 using Model;
 using System.Windows;
 using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace ViewModels
 {
@@ -24,6 +25,7 @@ namespace ViewModels
         private Command m_createFolderCommand;
         private Command m_addFolderOnClickCommand;
         private Command m_openFolderCommand;
+        private Command m_openFileCommand;
         private Command m_navigateBackCommand;
         private Command m_importFilesCommand;
         private Command m_exportFilesCommand;
@@ -133,6 +135,29 @@ namespace ViewModels
                 }
                 return m_openFolderCommand;
             }
+        }
+
+        public Command OpenFileCommand
+        {
+            get
+            {
+                if (m_openFileCommand == null)
+                {
+                    m_openFileCommand = new Command(OpenFile, CanOpenFile);
+                }
+                return m_openFileCommand;
+            }
+        }
+
+        private bool CanOpenFile(object arg)
+        {
+            return SelectedFile != null;
+        }
+
+        private void OpenFile(object obj)
+        {
+            var filename = SelectedFile.FileName;       
+            Process.Start("rundll32.exe", string.Format("shell32.dll,OpenAs_RunDLL {0}", filename));
         }
 
         public Command NavigateBackCommand

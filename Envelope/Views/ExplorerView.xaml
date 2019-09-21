@@ -32,6 +32,8 @@
             </StackPanel>
         </DataTemplate>
         <viewModels:ExplorerVM x:Key="ExplorerVM"/>
+
+        
     </UserControl.Resources>
     <Grid DataContext="{StaticResource ExplorerVM}" Margin="0,20,20,20">
         <Grid.RowDefinitions>
@@ -87,6 +89,7 @@
                         <i:EventTrigger EventName="MouseDoubleClick">
                             <i:InvokeCommandAction Command="{Binding OpenFolderCommand}" />
                         </i:EventTrigger>
+                        
                     </i:Interaction.Triggers>
                     <ListView.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -102,8 +105,13 @@
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                      ItemsSource="{Binding Files, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                      ItemTemplate="{StaticResource FileTemplate}"
-                     SelectedItem="{Binding SelectedFile}" >
-                    
+                     SelectedItem="{Binding SelectedFile}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="MouseDoubleClick">
+                            <i:InvokeCommandAction Command="{Binding OpenFileCommand}" />
+                        </i:EventTrigger>
+
+                    </i:Interaction.Triggers>
                     <ListView.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel />
