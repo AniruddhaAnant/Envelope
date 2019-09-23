@@ -157,8 +157,8 @@ namespace ViewModels
 
         private void OpenFile(object obj)
         {
-            var filename = SelectedFile.FileName;
-            Process.Start("rundll32.exe", string.Format("shell32.dll,OpenAs_RunDLL {0}", filename));
+            var filepath = m_filehandler.DecryptToTemp(SelectedFile.FilePath,SelectedFile.FileName);
+            Process.Start("rundll32.exe", string.Format("shell32.dll,OpenAs_RunDLL {0}", filepath));
         }
 
         public Command NavigateBackCommand
@@ -206,11 +206,14 @@ namespace ViewModels
         {
             if (SelectedFile != null)
             {
+                m_dbhandler.DeleteFile(SelectedFile);
+                m_filehandler.DeleteFile(SelectedFile.FilePath);
                 Files.Remove(SelectedFile);
             }
 
-            if (SelectedFolder != null)
+            if (SelectedFolder != null && !SelectedFolder.IsRootFolder && SelectedFolder != m_folderStack.Peek())
             {
+                m_dbhandler.DeleteFolder(SelectedFolder);
                 Folders.Remove(SelectedFolder);
             }
         }
@@ -261,13 +264,15 @@ namespace ViewModels
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Title = "Import File(s)";
             openFileDialog.Multiselect = true;
+            var CurrentFolder = m_folderStack.Peek();
+
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 foreach (var filename in openFileDialog.FileNames)
                 {
                     var encFilePath = m_filehandler.ImportFile(filename);
                     File file = new File(System.IO.Path.GetFileName(filename),
-                        SelectedFolder.FolderId, encFilePath, System.IO.Path.GetExtension(filename));
+                        CurrentFolder.FolderId, encFilePath, System.IO.Path.GetExtension(filename));
                     m_dbhandler.InsertFile(file);
                 }
             }
@@ -289,7 +294,7 @@ namespace ViewModels
 
         private bool CanOpenFolder(object arg)
         {
-            return SelectedFolder != Folders[0];
+            return !SelectedFolder.IsRootFolder ;
         }
 
         private void OpenFolder(object obj)
@@ -330,7 +335,7 @@ namespace ViewModels
         private void UpdateFiles()
         {
             Files.Clear();
-            foreach (var file in m_dbhandler.GetFiles(SelectedFolder))
+            foreach (var file in m_dbhandler.GetFiles(m_folderStack.Peek()))
             {
                 Files.Add(file);
             }

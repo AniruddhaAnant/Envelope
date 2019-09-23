@@ -17,7 +17,9 @@ namespace Model
         public int FolderId { get => m_folderId; internal set => m_folderId = value; }
         public int UserId { get => m_userId; internal set => m_userId = value; }
 
-        public Folder(string folderName,User user)
+        public bool IsRootFolder { get { return m_folderName == "root"; } }
+
+        public Folder(string folderName, User user)
         {
             m_folderName = folderName;
             UserId = user.User_id;

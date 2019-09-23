@@ -124,5 +124,16 @@ namespace Model
                 "WHERE username= '" + oldUser.UserName + "' AND password= '" + oldUser.Password + "'";
             m_manager.ExecuteNonQuery(sql);
         }
+
+        public void DeleteFile(File file)
+        {
+            string sql = "DELETE FROM files WHERE file_id=" + file.FilesId;
+            m_manager.ExecuteNonQuery(sql);
+        }
+        public void DeleteFolder(Folder folder)
+        {
+            string sql = "DELETE FROM folders WHERE folder_id=" + folder.FolderId;
+            m_manager.ExecuteNonQuery(sql);
+        }
     }
 }

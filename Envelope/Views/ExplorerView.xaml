@@ -83,7 +83,7 @@
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                      ItemsSource="{Binding Folders,UpdateSourceTrigger=PropertyChanged,  Mode=TwoWay}"
                      ItemTemplate="{StaticResource FolderTemplate}" 
-                     SelectedItem="{Binding SelectedFolder}" 
+                     SelectedItem="{Binding SelectedFolder, Mode=TwoWay}" 
                      Visibility="{Binding IsInRootDir, Converter={StaticResource BoolVisibilityConverter}}" >
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="MouseDoubleClick">
