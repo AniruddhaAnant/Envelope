@@ -29,6 +29,7 @@
             <StackPanel>
                 <Image Source="/Assets/003-test.png" Width="40" Height="40"/>
                 <TextBlock Text="{Binding FileName}"/>
+                
             </StackPanel>
         </DataTemplate>
         <viewModels:ExplorerVM x:Key="ExplorerVM"/>
@@ -114,6 +115,9 @@
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="MouseDoubleClick">
                             <i:InvokeCommandAction Command="{Binding OpenFileCommand}" />
+                        </i:EventTrigger>
+                        <i:EventTrigger EventName="MouseLeftButtonUp">
+                            <i:InvokeCommandAction Command="{Binding FileSelectionCommand}" />
                         </i:EventTrigger>
 
                     </i:Interaction.Triggers>

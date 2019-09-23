@@ -30,6 +30,7 @@ namespace ViewModels
         private Command m_importFilesCommand;
         private Command m_exportFilesCommand;
         private Command m_deleteCommand;
+        private Command m_fileSelectionCommand;
       
         private bool m_addFolderClicked = false;
         private Folder m_selectedFolder;
@@ -230,10 +231,38 @@ namespace ViewModels
             }
         }
 
+        public Command FileSelectionCommand
+        {
+            get
+            {
+              if( m_fileSelectionCommand == null)
+                {
+                    m_fileSelectionCommand = new Command(FileSelectionChanged, CanToggleFileSelection);
+                }
+                return m_fileSelectionCommand;
+            }
+        }
+
+        private bool CanToggleFileSelection(object arg)
+        {
+            return SelectedFile != null;
+        }
+
+        private void FileSelectionChanged(object obj)
+        {
+            SelectedFile.IsFileSelected = !SelectedFile.IsFileSelected;
+        }
 
         private bool CanExportFiles(object arg)
         {
-            return SelectedFile != null;
+            //Should be able to export if there is atleast one 
+            //file selected.
+            foreach(var file in Files)
+            {
+                if (file.IsFileSelected == true)
+                    return true;
+            }
+            return false;
         }
 
         private void ExportFiles(object obj)
@@ -244,7 +273,6 @@ namespace ViewModels
             {
                 foreach (var file in Files)
                 {
-                    file.IsFileSelected = true; //we need to set this bool true somewhere when some item is selected. 
                     if (file.IsFileSelected)
                     {
                         var filePath = saveFilesDialog.SelectedPath;
