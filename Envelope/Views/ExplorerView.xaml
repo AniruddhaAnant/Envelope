@@ -29,9 +29,12 @@
             <StackPanel>
                 <Image Source="/Assets/003-test.png" Width="40" Height="40"/>
                 <TextBlock Text="{Binding FileName}"/>
+                
             </StackPanel>
         </DataTemplate>
         <viewModels:ExplorerVM x:Key="ExplorerVM"/>
+
+        
     </UserControl.Resources>
     <Grid DataContext="{StaticResource ExplorerVM}" Margin="0,20,20,20">
         <Grid.RowDefinitions>
@@ -62,7 +65,7 @@
             <Button Content="Export File(s)" 
                     Margin="5,2,5,2"
                     Command="{Binding ExportFileCommand}"/>
-            <Button Content="Delete" Margin="5,2,5,2" />
+            <Button Content="Delete" Margin="5,2,5,2" Command="{Binding DeleteCommand}"/>
             <Button Content="Export" Margin="5,2,10,2" />
         </StackPanel>
         <Separator Grid.Row="1"/>
@@ -81,12 +84,13 @@
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                      ItemsSource="{Binding Folders,UpdateSourceTrigger=PropertyChanged,  Mode=TwoWay}"
                      ItemTemplate="{StaticResource FolderTemplate}" 
-                     SelectedItem="{Binding SelectedFolder}" 
+                     SelectedItem="{Binding SelectedFolder, Mode=TwoWay}" 
                      Visibility="{Binding IsInRootDir, Converter={StaticResource BoolVisibilityConverter}}" >
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="MouseDoubleClick">
                             <i:InvokeCommandAction Command="{Binding OpenFolderCommand}" />
                         </i:EventTrigger>
+                        
                     </i:Interaction.Triggers>
                     <ListView.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -98,13 +102,25 @@
                 <ListView x:Name="FilesList"
                           Grid.Row="1"
                           Margin="10"    
-                          SelectionMode="Multiple"
                      ScrollViewer.CanContentScroll="False"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                      ItemsSource="{Binding Files, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                      ItemTemplate="{StaticResource FileTemplate}"
-                     SelectedItems="{Binding SelectedFiles}" >
-                    
+                     SelectedItem="{Binding SelectedFile}">
+                    <ListView.Resources>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="IsSelected" Value="{Binding IsFileSelected, Mode=TwoWay}"/>
+                        </Style>
+                    </ListView.Resources>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="MouseDoubleClick">
+                            <i:InvokeCommandAction Command="{Binding OpenFileCommand}" />
+                        </i:EventTrigger>
+                        <i:EventTrigger EventName="MouseLeftButtonUp">
+                            <i:InvokeCommandAction Command="{Binding FileSelectionCommand}" />
+                        </i:EventTrigger>
+
+                    </i:Interaction.Triggers>
                     <ListView.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel />

@@ -8,6 +8,7 @@ using ViewModels.Helpers;
 using Model;
 using System.Windows;
 using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace ViewModels
 {
@@ -15,7 +16,7 @@ namespace ViewModels
     {
         private ObservableCollection<Folder> m_folders;
         private ObservableCollection<File> m_files;
-        public ObservableCollection<File> m_selectedFiles;
+        File m_selectedFile;
 
         private SQLiteHandler m_dbhandler;
         private FileHandler m_filehandler;
@@ -24,15 +25,18 @@ namespace ViewModels
         private Command m_createFolderCommand;
         private Command m_addFolderOnClickCommand;
         private Command m_openFolderCommand;
+        private Command m_openFileCommand;
         private Command m_navigateBackCommand;
         private Command m_importFilesCommand;
         private Command m_exportFilesCommand;
-
+        private Command m_deleteCommand;
+        private Command m_fileSelectionCommand;
+      
         private bool m_addFolderClicked = false;
         private Folder m_selectedFolder;
 
         private bool m_isInRootDir = true;
-
+       
         public bool IsInRootDir
         {
             get
@@ -56,10 +60,14 @@ namespace ViewModels
             }
         }
 
-        public ObservableCollection<File> SelectedFiles
+        public File SelectedFile
         {
-            get { return m_selectedFiles; }
-            set { m_selectedFiles = value; }
+            get { return m_selectedFile; }
+            set
+            {
+                m_selectedFile = value;
+                RaiseEvent("SelectedFile");
+            }
         }
 
         public string NewFolderName { get; set; }
@@ -131,6 +139,29 @@ namespace ViewModels
             }
         }
 
+        public Command OpenFileCommand
+        {
+            get
+            {
+                if (m_openFileCommand == null)
+                {
+                    m_openFileCommand = new Command(OpenFile, CanOpenFile);
+                }
+                return m_openFileCommand;
+            }
+        }
+
+        private bool CanOpenFile(object arg)
+        {
+            return SelectedFile != null;
+        }
+
+        private void OpenFile(object obj)
+        {
+            var filepath = m_filehandler.DecryptToTemp(SelectedFile.FilePath,SelectedFile.FileName);
+            Process.Start("rundll32.exe", string.Format("shell32.dll,OpenAs_RunDLL {0}", filepath));
+        }
+
         public Command NavigateBackCommand
         {
             get
@@ -155,6 +186,39 @@ namespace ViewModels
             }
         }
 
+        public Command DeleteCommand
+        {
+            get
+            {
+                if (m_deleteCommand == null)
+                {
+                    m_deleteCommand = new Command(Delete, CanDelete);
+                }
+                return m_deleteCommand;
+            }
+        }
+
+        private bool CanDelete(object arg)
+        {
+            return SelectedFile != null;
+        }
+
+        private void Delete(object obj)
+        {
+            if (SelectedFile != null)
+            {
+                m_dbhandler.DeleteFile(SelectedFile);
+                m_filehandler.DeleteFile(SelectedFile.FilePath);
+                Files.Remove(SelectedFile);
+            }
+
+            if (SelectedFolder != null && !SelectedFolder.IsRootFolder && SelectedFolder != m_folderStack.Peek())
+            {
+                m_dbhandler.DeleteFolder(SelectedFolder);
+                Folders.Remove(SelectedFolder);
+            }
+        }
+
         public Command ExportFileCommand
         {
             get
@@ -167,10 +231,38 @@ namespace ViewModels
             }
         }
 
+        public Command FileSelectionCommand
+        {
+            get
+            {
+              if( m_fileSelectionCommand == null)
+                {
+                    m_fileSelectionCommand = new Command(FileSelectionChanged, CanToggleFileSelection);
+                }
+                return m_fileSelectionCommand;
+            }
+        }
+
+        private bool CanToggleFileSelection(object arg)
+        {
+            return SelectedFile != null;
+        }
+
+        private void FileSelectionChanged(object obj)
+        {
+            SelectedFile.IsFileSelected = !SelectedFile.IsFileSelected;
+        }
 
         private bool CanExportFiles(object arg)
         {
-            return SelectedFiles.Count > 0;
+            //Should be able to export if there is atleast one 
+            //file selected.
+            foreach(var file in Files)
+            {
+                if (file.IsFileSelected == true)
+                    return true;
+            }
+            return false;
         }
 
         private void ExportFiles(object obj)
@@ -179,10 +271,13 @@ namespace ViewModels
             saveFilesDialog.Description = "Select Export Directory";
             if (saveFilesDialog.ShowDialog() == DialogResult.OK)
             {
-                foreach (var file in SelectedFiles)
+                foreach (var file in Files)
                 {
-                    var filePath = saveFilesDialog.SelectedPath;
-                    m_filehandler.ExportFile(file.FilePath, System.IO.Path.Combine(filePath, file.FileName));
+                    if (file.IsFileSelected)
+                    {
+                        var filePath = saveFilesDialog.SelectedPath;
+                        m_filehandler.ExportFile(file.FilePath, System.IO.Path.Combine(filePath, file.FileName));
+                    }
                 }
             }
         }
@@ -197,13 +292,15 @@ namespace ViewModels
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Title = "Import File(s)";
             openFileDialog.Multiselect = true;
+            var CurrentFolder = m_folderStack.Peek();
+
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 foreach (var filename in openFileDialog.FileNames)
                 {
                     var encFilePath = m_filehandler.ImportFile(filename);
                     File file = new File(System.IO.Path.GetFileName(filename),
-                        SelectedFolder.FolderId, encFilePath, System.IO.Path.GetExtension(filename));
+                        CurrentFolder.FolderId, encFilePath, System.IO.Path.GetExtension(filename));
                     m_dbhandler.InsertFile(file);
                 }
             }
@@ -225,7 +322,7 @@ namespace ViewModels
 
         private bool CanOpenFolder(object arg)
         {
-            return SelectedFolder != Folders[0];
+            return !SelectedFolder.IsRootFolder ;
         }
 
         private void OpenFolder(object obj)
@@ -266,7 +363,7 @@ namespace ViewModels
         private void UpdateFiles()
         {
             Files.Clear();
-            foreach (var file in m_dbhandler.GetFiles(SelectedFolder))
+            foreach (var file in m_dbhandler.GetFiles(m_folderStack.Peek()))
             {
                 Files.Add(file);
             }
@@ -275,7 +372,6 @@ namespace ViewModels
         {
             Folders = new ObservableCollection<Folder>();
             Files = new ObservableCollection<File>();
-            SelectedFiles = new ObservableCollection<File>();
 
             m_dbhandler = new SQLiteHandler();
             var user = m_dbhandler.GetUser();
